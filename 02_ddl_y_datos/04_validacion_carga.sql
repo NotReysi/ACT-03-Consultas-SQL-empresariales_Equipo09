@@ -1,4 +1,4 @@
-SET search_path TO dm_libromundo;
+USE dm_libromundo;
 
 -- 1) Volumen (requisito: >= 1,000 filas en fact_ventas)
 SELECT 'fact_ventas' AS tabla, COUNT(*) AS filas FROM fact_ventas

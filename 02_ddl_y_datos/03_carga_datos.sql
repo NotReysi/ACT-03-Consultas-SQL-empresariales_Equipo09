@@ -91,6 +91,8 @@ DROP PROCEDURE sp_generar_ventas;
 
 -- 6. Generar Devoluciones simuladas (basadas en ventas existentes)
 INSERT INTO fact_devoluciones (devolucion_id, venta_id, fecha_key, item_key, sucursal_key, motivo_devolucion, importe_devuelto, cantidad_devuelta)
-SELECT fact_venta_id, venta_id, fecha_key + 5, item_key, sucursal_key, 'Error de pedido', venta_neta / cantidad, 1
-FROM fact_ventas
-WHERE fact_venta_id % 25 = 0;
+SELECT f.fact_venta_id, f.venta_id, 
+       CAST(DATE_FORMAT(DATE_ADD(STR_TO_DATE(CAST(f.fecha_key AS CHAR), '%Y%m%d'), INTERVAL 5 DAY), '%Y%m%d') AS UNSIGNED), 
+       f.item_key, f.sucursal_key, 'Error de pedido', f.venta_neta / f.cantidad, 1
+FROM fact_ventas f
+WHERE f.fact_venta_id % 25 = 0;

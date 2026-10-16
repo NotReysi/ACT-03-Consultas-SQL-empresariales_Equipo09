@@ -3,7 +3,7 @@
 Archivos reconstruidos a partir del DDL PostgreSQL que el equipo entrego para la Unidad 2. **No ejecutar el DDL PostgreSQL en MySQL.**
 
 ## Orden
-1. `01_ddl/LibroMundo_DataMart_DDL_MySQL8.sql`: ejecutar en MySQL Workbench sobre una base nueva. Crea `dm_libromundo` y todas las tablas, constraints, indices y cliente no identificado. No incluye datos simulados.
+1. `02_ddl_y_datos/LibroMundo_DataMart_DDL_MySQL8.sql`: ejecutar en MySQL Workbench sobre una base nueva.
 2. Cargar datos Q1/Q2 2026 **validos** (>= 1000 filas de fact_ventas, >= 3 regiones, >= 5 productos con actividad Q2 en cada region). Sin datos, los reportes estaran vacios.
 3. `05_validacion_y_explain/validaciones.sql`: ejecutar pruebas y guardar resultados reales.
 4. `04_consultas_sql/consulta_final.sql`: Top 5 para Q2 vs Q1.
@@ -14,7 +14,8 @@ Archivos reconstruidos a partir del DDL PostgreSQL que el equipo entrego para la
 ## Decisiones y limites
 - **Grano**: `fact_ventas` = item dentro de transaccion. El DDL restringe `(venta_id, item_key)` a unico.
 - **Region**: `dim_sucursal.region`, sucursal de origen de la venta.
-- **Rentabilidad monetaria**: `SUM(fact_ventas.margen)` menos `SUM(fact_devoluciones.importe_devuelto)` en fecha de la devolucion. **Provisional**: no equivale a beneficio economico neto cuando la devolucion recupera inventario, pues falta registrar el costo recuperado.
+- **Rentabilidad monetaria**: `SUM(fact_ventas.margen)` menos `SUM(fact_devoluciones.importe_devuelto)` asignado a la fecha de la venta original, respetando la regla del negocio.
+- **Provisional**: no equivale a beneficio economico neto cuando la devolucion recupera inventario, pues falta registrar el costo recuperado.
 - **Descuentos**: incluidos en `margen` generado de `venta_neta`.
 - **Cancelaciones**: modelo no contiene columna de estado; no hay forma de excluirlas mediante una condicion real.
 - **Devoluciones**: se agregan por separado, para evitar duplicar margen por JOIN 1:N. Solo entran si `(venta_id,item_key)` identifica una venta original.

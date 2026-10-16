@@ -28,7 +28,7 @@ devoluciones_periodo AS (
     FROM dm_libromundo.fact_devoluciones AS dev
     INNER JOIN dm_libromundo.fact_ventas AS v
       ON v.venta_id = dev.venta_id AND v.item_key = dev.item_key
-    INNER JOIN dm_libromundo.dim_fecha AS f ON f.fecha_key = dev.fecha_key
+    INNER JOIN dm_libromundo.dim_fecha AS f ON f.fecha_key = v.fecha_key
     INNER JOIN dm_libromundo.dim_sucursal AS s ON s.sucursal_key = v.sucursal_key
     INNER JOIN dm_libromundo.dim_item AS i ON i.item_key = dev.item_key
     WHERE (f.fecha >= '2026-01-01' AND f.fecha < '2026-04-01')
