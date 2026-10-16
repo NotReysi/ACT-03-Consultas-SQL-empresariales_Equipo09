@@ -1,6 +1,6 @@
 /* ================================================================
    DATA MART DE VENTAS - LIBROMUNDO
-   Motor: PostgreSQL
+   Motor: MySQL 8.0.16+
 
    Objetivo:
    Crear el modelo dimensional para analizar:
@@ -25,8 +25,8 @@
    análisis que la fuente original no soporta directamente.
 ================================================================ */
 
-CREATE SCHEMA IF NOT EXISTS dm_libromundo;
-SET search_path TO dm_libromundo;
+CREATE DATABASE IF NOT EXISTS dm_libromundo CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE dm_libromundo;
 
 /* =========================
    DIMENSIÓN FECHA
@@ -44,14 +44,13 @@ CREATE TABLE dim_fecha (
     es_fin_semana   BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-COMMENT ON TABLE dim_fecha IS
-'Dimensión calendario compartida por ventas, devoluciones y eventos.';
+
 
 /* =========================
    DIMENSIÓN CLIENTE
 ========================= */
 CREATE TABLE dim_cliente (
-    cliente_key        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    cliente_key        BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     cliente_id         BIGINT,
     nombre             VARCHAR(200),
     tipo_cliente       VARCHAR(50),
@@ -66,7 +65,7 @@ CREATE TABLE dim_cliente (
    DIMENSIÓN SUCURSAL
 ========================= */
 CREATE TABLE dim_sucursal (
-    sucursal_key    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sucursal_key    BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     sucursal_id     BIGINT NOT NULL UNIQUE,
     nombre          VARCHAR(150) NOT NULL,
     ciudad          VARCHAR(100),
@@ -77,19 +76,18 @@ CREATE TABLE dim_sucursal (
    DIMENSIÓN CANAL
 ========================= */
 CREATE TABLE dim_canal (
-    canal_key       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    canal_key       BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     canal_id        BIGINT NOT NULL UNIQUE,
     nombre_canal    VARCHAR(80) NOT NULL
 );
 
-COMMENT ON TABLE dim_canal IS
-'Representa el medio por el que se realizó la venta. Preventa no se modela como canal.';
+
 
 /* =========================
    DIMENSIÓN ITEM
 ========================= */
 CREATE TABLE dim_item (
-    item_key                BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    item_key                BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     item_id                 BIGINT NOT NULL UNIQUE,
     tipo_item               VARCHAR(30) NOT NULL
                             CHECK (tipo_item IN ('LIBRO','PRODUCTO_NO_EDITORIAL')),
@@ -112,7 +110,7 @@ CREATE TABLE dim_item (
    DIMENSIÓN AUTOR
 ========================= */
 CREATE TABLE dim_autor (
-    autor_key       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    autor_key       BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     autor_id        BIGINT NOT NULL UNIQUE,
     nombre_autor    VARCHAR(200) NOT NULL
 );
@@ -134,7 +132,7 @@ CREATE TABLE bridge_item_autor (
    DIMENSIÓN GÉNERO
 ========================= */
 CREATE TABLE dim_genero (
-    genero_key       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    genero_key       BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     genero_id        BIGINT NOT NULL UNIQUE,
     nombre_genero    VARCHAR(120) NOT NULL
 );
@@ -156,7 +154,7 @@ CREATE TABLE bridge_item_genero (
    DIMENSIÓN TEMPORADA
 ========================= */
 CREATE TABLE dim_temporada (
-    temporada_key      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    temporada_key      BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     temporada_id       BIGINT NOT NULL UNIQUE,
     nombre_temporada   VARCHAR(120) NOT NULL,
     fecha_inicio       DATE NOT NULL,
@@ -168,7 +166,7 @@ CREATE TABLE dim_temporada (
    DIMENSIÓN PROMOCIÓN
 ========================= */
 CREATE TABLE dim_promocion (
-    promocion_key      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    promocion_key      BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     promocion_id       BIGINT NOT NULL UNIQUE,
     nombre             VARCHAR(200) NOT NULL,
     tipo_promocion     VARCHAR(80),
@@ -182,7 +180,7 @@ CREATE TABLE dim_promocion (
    DIMENSIÓN EVENTO
 ========================= */
 CREATE TABLE dim_evento (
-    evento_key       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    evento_key       BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     evento_id        BIGINT NOT NULL UNIQUE,
     tipo_evento      VARCHAR(100),
     tema             VARCHAR(250)
@@ -193,7 +191,7 @@ CREATE TABLE dim_evento (
    Grano: un ITEM vendido dentro de una transacción.
 ========================= */
 CREATE TABLE fact_ventas (
-    fact_venta_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    fact_venta_id       BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     venta_id            BIGINT NOT NULL,
     fecha_key           INTEGER NOT NULL,
     cliente_key         BIGINT NOT NULL,
@@ -236,8 +234,7 @@ CREATE TABLE fact_ventas (
     CHECK (descuento <= cantidad * precio_unitario)
 );
 
-COMMENT ON TABLE fact_ventas IS
-'Tabla de hechos principal. Grano: un ITEM vendido dentro de una transacción de venta.';
+
 
 /* =========================
    BRIDGE VENTA - PROMOCIÓN
@@ -258,7 +255,7 @@ CREATE TABLE bridge_venta_promocion (
    Grano: un evento realizado en una sucursal y fecha.
 ========================= */
 CREATE TABLE fact_eventos (
-    fact_evento_id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    fact_evento_id         BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     evento_key             BIGINT NOT NULL,
     fecha_key              INTEGER NOT NULL,
     sucursal_key           BIGINT NOT NULL,
@@ -297,7 +294,7 @@ CREATE TABLE bridge_venta_evento (
    Grano: un registro de devolución de un ITEM asociado a una venta.
 ========================= */
 CREATE TABLE fact_devoluciones (
-    fact_devolucion_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    fact_devolucion_id    BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     devolucion_id         BIGINT NOT NULL UNIQUE,
     venta_id              BIGINT NOT NULL,
     fecha_key             INTEGER NOT NULL,
@@ -377,7 +374,7 @@ VALUES (
     NULL,
     NULL
 )
-ON CONFLICT (cliente_id) DO NOTHING;
+ON DUPLICATE KEY UPDATE cliente_id = cliente_id;
 
 /* =========================
    FIN DEL DDL
