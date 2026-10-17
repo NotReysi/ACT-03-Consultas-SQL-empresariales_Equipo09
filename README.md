@@ -1,5 +1,10 @@
 # LibroMundo — Unidad 3, MySQL 8.0+
 
+### Miembros:
+- 2227015 Uriel Samuel Bravo Castillo
+- 2226968 Orlando Alvarado Vargas
+- 2227010 Nelson Tadeo Muñoz Flores
+
 Archivos reconstruidos a partir del DDL PostgreSQL que el equipo entrego para la Unidad 2. **No ejecutar el DDL PostgreSQL en MySQL.**
 
 ## Orden
