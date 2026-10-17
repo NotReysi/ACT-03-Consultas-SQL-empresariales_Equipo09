@@ -5,6 +5,8 @@
 - 2226968 Orlando Alvarado Vargas
 - 2227010 Nelson Tadeo Muñoz Flores
 
+---
+
 Archivos reconstruidos a partir del DDL PostgreSQL que el equipo entrego para la Unidad 2. **No ejecutar el DDL PostgreSQL en MySQL.**
 
 ## Orden
